@@ -4,7 +4,7 @@ import yfinance as yf
 import numpy as np
 import talib
 import pandas as pd
-import otherfunctions as of
+import datesEdit as of
 import pandas_ta as ta
 from warnings import simplefilter
 from os import listdir
@@ -20,7 +20,6 @@ TARGET_THREASHOLD = 0.025
 simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 candle_names = talib.get_function_groups()['Pattern Recognition']
 tickers = of.get_tickers()
-
 
 vix = yf.Ticker('^VIX')
 vix = vix.history(start=START, end=END, interval=INTERVAL)
@@ -57,15 +56,15 @@ def add_indicators(df):
                   df.ta.wma(), df.ta.fwma(), df.ta.hma(), df.ta.hwma(), df.ta.jma(), df.ta.kama(),
                   df.ta.mcgd(), df.ta.pwma(), df.ta.sinwma(), df.ta.swma(), df.ta.t3(),
                   df.ta.tema(), df.ta.trima(), df.ta.vidya(), df.ta.vwma(), df.ta.zlma(), df.ta.chop(),
-                  df.ta.increasing(), df.ta.decreasing(), df.ta.qstick(),  df.ta.vhf(), df.ta.atr(),
+                  df.ta.increasing(), df.ta.decreasing(), df.ta.qstick(), df.ta.vhf(), df.ta.atr(),
                   df.ta.massi(), df.ta.pdist(), df.ta.rvi(), df.ta.ui(), df.ta.ad(), df.ta.adosc(),
                   df.ta.cmf(), df.ta.efi(), df.ta.mfi(), df.ta.obv(), df.ta.pvr(), df.ta.pvt(),
                   df.ta.ebsw()]
     names = ['ao', 'apo', 'bias', 'bop', 'cci', 'cfo', 'cmo', 'coppock', 'cti', 'inertia', 'mom', 'pgo', 'psl',
              'roc', 'rsi', 'rsx', 'willr', 'alma', 'dema', 'wma', 'fwma', 'hma', 'hwma', 'jma', 'kama',
              'mcgd', 'pwma', 'sinwma', 'swma', 't3', 'tema', 'trima', 'vidya', 'vwma', 'zlma', 'chop',
-             'increasing', 'decreasing' ,'qstick', 'vhf', 'atr', 'massi', 'pdist', 'rvi',
-             'ui', 'ad', 'adosc', 'cmf', 'efi', 'mfi', 'obv', 'pvr', 'pvt', 'ebsw',]
+             'increasing', 'decreasing', 'qstick', 'vhf', 'atr', 'massi', 'pdist', 'rvi',
+             'ui', 'ad', 'adosc', 'cmf', 'efi', 'mfi', 'obv', 'pvr', 'pvt', 'ebsw', ]
 
     for name, indicator in zip(names, indicators):
         try:
@@ -83,8 +82,9 @@ def add_other(df):
     df['Cumulative Return'] = (1 + df['DPC']).cumprod()
     df['PriceUp'] = np.where(df['DPC'] > 0, 1, 0)
     df['PriceDown'] = np.where(df['DPC'] < 0, 1, 0)
-    df['Close Change'] = df['Close']/df['Close'].shift(1) - 1
+    df['Close Change'] = df['Close'] / df['Close'].shift(1) - 1
     df['Target'] = np.where(df['Close Change'] > TARGET_THREASHOLD, 1, 0)
+
 
 def check_data():
     onlyfiles = [f for f in listdir("./data/stocks/") if isfile(join("./data/stocks/", f))]

@@ -14,14 +14,14 @@ SNPPATH = "S&P500.csv"
 path = "c:/users/roeym/desktop/backtrade/data/dates/*.csv"
 
 
-def clear_unnamed():
+def clear_unnamed(dates):
     for date in dates:
         df = pd.read_csv(f"./data/dates/{date}.csv")
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
         df.to_csv(f"./data/dates/{date}.csv")
 
 
-def get_advance_decline_ratio():
+def get_advance_decline_ratio(dates, df_sp):
     adr, add = [], []
     for date in dates:
         date_df = pd.read_csv(f"./data/dates/{date}.csv")
@@ -41,7 +41,7 @@ def get_advance_decline_ratio():
     df_sp.to_csv(SNPPATH)
 
 
-def calc_mcclellan():
+def calc_mcclellan(dates):
     df = pd.read_csv(SNPPATH, index_col=[0])
     add = df['AD_difference']
     ema19 = ta.ema((add * 0.1), 19)
@@ -59,7 +59,7 @@ def calc_mcclellan():
             curr_df.to_csv(f"./data/dates/{date}.csv")
 
 
-def get_high_corr(ticker):
+def get_high_corr(ticker, tickers):
     req_df = pd.read_csv(f"./data/stocks/{ticker}.csv")
     req_close = req_df['Close']
     corr = []
@@ -100,13 +100,13 @@ def get_columns(tickers):
     return columns_list
 
 
-def creating_dates():
+def creating_dates(dates, columns):
     for date in dates:
         df = pd.DataFrame(columns=columns)
         df.to_csv(f"./data/dates/{date}.csv")
 
 
-def stocks_to_dates():
+def stocks_to_dates(tickers, dates):
     bad_stocks = []
     for index, ticker in enumerate(tickers):
         try:
@@ -122,10 +122,7 @@ def stocks_to_dates():
     print(bad_stocks)
 
 
-
-
-
-if __name__ == '__main__':
+def dates_edit_main():
     t1 = time.perf_counter()
     # df_sp = create_Sp500()
     df_sp = pd.read_csv(SNPPATH)
@@ -133,9 +130,9 @@ if __name__ == '__main__':
     dates = get_dates(tickers)
     columns = get_columns(tickers)
     columns.remove('Date')
-    creating_dates()
-    stocks_to_dates()
-    get_advance_decline_ratio()
-    calc_mcclellan()
+    creating_dates(dates, columns)
+    stocks_to_dates(tickers, dates)
+    get_advance_decline_ratio(dates, df_sp)
+    calc_mcclellan(dates)
     t2 = time.perf_counter()
-    print(f'Finished in {t2 - t1} seconds')
+    print(f'Finished dates_edit_main in {t2 - t1} seconds')

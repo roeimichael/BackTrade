@@ -1,8 +1,9 @@
 import pandas as pd
 import time
-import otherfunctions as of
+import datesEdit as of
 import numpy as np
 
+WINDOWSIZE = 10
 not_normalized = ["ma200", "ma50", "TRIX", "stochK", "stochD", "TRANGE", "BBupperband", "BBmiddleband", "BBlowerband",
                   "ao", "cci", "coppock", "mom", "pgo", "alma", "dema", "wma", "fwma", "hma", "hwma", "jma", "kama",
                   "mcgd", "pwma", "sinwma", "swma", "t3", "tema", "trima", "vidya", "vwma", "zlma", "qstick", "vhf",
@@ -11,6 +12,19 @@ not_normalized = ["ma200", "ma50", "TRIX", "stochK", "stochD", "TRANGE", "BBuppe
 normalized = ["ADX", "ADXR", "AROONOSC", "DX", "PPO", "ULTOSC", "MACD", "MACDSIG", "MACDHIS", "apo", "bias", "bop",
               "cfo", "cmo", "cti", "inertia", "psl", "roc", "rsi", "rsx", "willr", "chop", "increasing", "decreasing",
               "mfi", "pvr", "ebsw", "PriceUp", "PriceDown", "VIX", "VVIX", "VXN"]
+
+
+def windownormdist_normalization(list):
+    normalized_data, sublist = [], []
+    m, std = 0, 0
+    for i in range(len(list) - WINDOWSIZE):
+        sublist = list[i:i + WINDOWSIZE]
+        m = np.mean(sublist, axis=0)
+        std = np.std(sublist, axis=0)
+        normalized_data.append((list[i] - m) / std)
+    for j in range(WINDOWSIZE):
+        normalized_data.append((list[j - 10] - m) / std)
+    return normalized_data
 
 
 def tanh_normalization(unnormalized_data):
@@ -34,7 +48,6 @@ def sigmoid_normalization(unnormalized_data):
     return normalized_data
 
 
-
 def median_normalization(unnormalized_data):
     m = np.median(unnormalized_data, axis=0)
     normalized_data = unnormalized_data / m
@@ -46,7 +59,7 @@ def min_max_normalization(unnormalized_data):
     return normalized_data
 
 
-def normalize_tickers():
+def normalize_tickers(tickers):
     unavilable = []
     for index, ticker in enumerate(tickers):
         try:
@@ -62,10 +75,10 @@ def normalize_tickers():
     print(unavilable)
 
 
-if __name__ == '__main__':
+def normalization_main():
     t1 = time.perf_counter()
     tickers = of.get_tickers()
     # dates = of.get_dates(tickers)
-    normalize_tickers()
+    normalize_tickers(tickers)
     t2 = time.perf_counter()
-    print(f'Finished in {t2 - t1} seconds')
+    print(f'Finished normalization_main in {t2 - t1} seconds')
