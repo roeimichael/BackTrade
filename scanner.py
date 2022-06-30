@@ -17,10 +17,14 @@ PERIOD = "3y"
 SPLITS = 25
 TARGET_THREASHOLD = 0.025
 
+# removes warnings
 simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
+# takes a list of all candle names
 candle_names = talib.get_function_groups()['Pattern Recognition']
 tickers = of.get_tickers()
 
+# creates values of the VIX,VVIX and VXN so that they could be added to the stock information as a breath market
+# indicator.
 vix = yf.Ticker('^VIX')
 vix = vix.history(start=START, end=END, interval=INTERVAL)
 vvix = yf.Ticker('^VVIX')
@@ -29,11 +33,13 @@ vxn = yf.Ticker('^VXN')
 vxn = vxn.history(start=START, end=END, interval=INTERVAL)
 
 
+# adds all the candles to the data
 def add_candles(df):
     for candle in candle_names:
         df[candle] = getattr(talib, candle)(df['Open'], df['High'], df['Low'], df['Close'])
 
 
+# adds all the technical indicators to the data (taken from talib and pandas_ta)
 def add_indicators(df):
     df['ma50'] = df['Open'].rolling(50).mean()
     df['ma200'] = df['Open'].rolling(200).mean()
@@ -73,6 +79,7 @@ def add_indicators(df):
             print(f"the problame is in indicator : {indicator}, {name}")
 
 
+# adds other types of information to the data, and the target column.
 def add_other(df):
     df['VIX'] = vix['Close']
     df['VVIX'] = vvix['Close']
@@ -86,17 +93,20 @@ def add_other(df):
     df['Target'] = np.where(df['Close Change'] > TARGET_THREASHOLD, 1, 0)
 
 
+# a support function created to see if all the files are in place.
 def check_data():
     onlyfiles = [f for f in listdir("./data/stocks/") if isfile(join("./data/stocks/", f))]
     print(len(onlyfiles))
     print(len(tickers))
 
 
+# creates the thread for the scanner to run on
 def create_threads(splits):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(create_csv, splits)
 
 
+# creats each individual csv and call the data filling functions for that stock.
 def create_csv(ticker):
     stock = yf.Ticker(ticker)
     df = stock.history(start=START, end=END, interval=INTERVAL, prepost=False)
@@ -108,6 +118,8 @@ def create_csv(ticker):
     df.to_csv(f"./data/stocks/{ticker}.csv")
 
 
+# creates multiprocesses for the data to be divided on and each multiproccess is than being divided to threads and on
+# each thread a stock file is being created.
 def main():
     t1 = time.perf_counter()
     splits = np.array_split(tickers, SPLITS)
