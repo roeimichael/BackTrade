@@ -7,7 +7,9 @@ WINDOWSIZE = 10
 simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 
 
-def concatnate_date(windowsize,dates):
+# concatnate the last Windowsize dates following each date in the list so that the bot can recive updates information
+# of the last 10 dates.
+def concatnate_date(windowsize, dates):
     reverseddates = dates.tolist()[::-1]
     for i in range(len(reverseddates)):
         print(f"currently at {i} date :{reverseddates[i]} out of {len(reverseddates)}")
@@ -20,10 +22,8 @@ def concatnate_date(windowsize,dates):
         df.to_csv(f"./data/dates/{reverseddates[i]}.csv")
 
 
-def concatanation_main():
+def concatanation_main(dates):
     t1 = time.perf_counter()
-    tickers = of.get_tickers()
-    dates = of.get_dates(tickers)
-    concatnate_date(WINDOWSIZE,dates)
+    concatnate_date(WINDOWSIZE, dates)
     t2 = time.perf_counter()
     print(f'Finished concatanation_main in {t2 - t1} seconds')

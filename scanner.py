@@ -120,7 +120,7 @@ def create_csv(ticker):
 
 # creates multiprocesses for the data to be divided on and each multiproccess is than being divided to threads and on
 # each thread a stock file is being created.
-def main():
+def main(tickers):
     t1 = time.perf_counter()
     splits = np.array_split(tickers, SPLITS)
     with concurrent.futures.ProcessPoolExecutor() as executor:

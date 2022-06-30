@@ -93,10 +93,8 @@ def normalize_tickers(tickers):
 
 
 # defualt main function to run the functions required as one.
-def normalization_main():
+def normalization_main(tickers):
     t1 = time.perf_counter()
-    tickers = of.get_tickers()
-    # dates = of.get_dates(tickers)
     normalize_tickers(tickers)
     t2 = time.perf_counter()
     print(f'Finished normalization_main in {t2 - t1} seconds')

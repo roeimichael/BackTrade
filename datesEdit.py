@@ -7,8 +7,6 @@ import glob
 START = "2019-05-01"
 END = "2022-05-01"
 INTERVAL = '1d'
-STOCKSCSV = "Stocks in the SP 500 Index.csv"
-SP500TICKER = "^GSPC"
 PERIOD = "3y"
 SNPPATH = "S&P500.csv"
 path = "c:/users/roeym/desktop/backtrade/data/dates/*.csv"
@@ -80,34 +78,6 @@ def get_high_corr(ticker, tickers):
     return [x[1] for x in top3]
 
 
-def get_dates(tickers):
-    ex_tick = tickers[0]
-    ex_ticker_df = pd.read_csv(f"./data/stocks/{ex_tick}.csv")
-    dates_list = ex_ticker_df['Date']
-    return dates_list
-
-
-def create_Sp500():
-    stock = yf.Ticker(SP500TICKER)
-    df_sp = stock.history(start=START, end=END, interval=INTERVAL)
-    df_sp = df_sp.drop(columns=['Dividends', 'Stock Splits'])
-    df_sp.to_csv(f"S&P500.csv")
-    return df_sp
-
-
-def get_tickers():
-    sandp500 = pd.read_csv(STOCKSCSV)
-    ticks = sandp500['Symbol']
-    return ticks
-
-
-def get_columns(tickers):
-    ex_tick = tickers[0]
-    ex_ticker_df = pd.read_csv(f"./data/stocks/{ex_tick}.csv")
-    columns_list = ex_ticker_df.columns.values.tolist()
-    return columns_list
-
-
 # creates the files of the dates so we have something to iterate in.
 def creating_dates(dates, columns):
     for date in dates:
@@ -134,13 +104,9 @@ def stocks_to_dates(tickers, dates):
 
 
 # the main function that unionize all the functions in order that needs to be played in this part.
-def dates_edit_main():
+def dates_edit_main(tickers, dates, columns):
     t1 = time.perf_counter()
-    # df_sp = create_Sp500()
     df_sp = pd.read_csv(SNPPATH)
-    tickers = get_tickers()
-    dates = get_dates(tickers)
-    columns = get_columns(tickers)
     columns.remove('Date')
     creating_dates(dates, columns)
     stocks_to_dates(tickers, dates)
