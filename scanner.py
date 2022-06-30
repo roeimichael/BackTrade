@@ -4,7 +4,6 @@ import yfinance as yf
 import numpy as np
 import talib
 import pandas as pd
-import datesEdit as of
 import pandas_ta as ta
 from warnings import simplefilter
 from os import listdir
@@ -21,7 +20,6 @@ TARGET_THREASHOLD = 0.025
 simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 # takes a list of all candle names
 candle_names = talib.get_function_groups()['Pattern Recognition']
-tickers = of.get_tickers()
 
 # creates values of the VIX,VVIX and VXN so that they could be added to the stock information as a breath market
 # indicator.
@@ -129,5 +127,4 @@ def main(tickers):
     print(f'Finished in {t2 - t1} seconds')
 
 
-if __name__ == '__main__':
-    main()
+

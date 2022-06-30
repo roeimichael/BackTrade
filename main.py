@@ -2,7 +2,7 @@ import concatnation
 import scanner
 import normalization
 import datesEdit
-import pandas as pd
+
 import yfinance as yf
 
 STOCKSCSV = "Stocks in the SP 500 Index.csv"
@@ -24,7 +24,7 @@ def create_Sp500():
 # gets the list of all columns used in the project
 def get_columns():
     columns_names = []
-    with open('columns.txt', 'r') as fp:
+    with open('./data/columns.txt', 'r') as fp:
         for line in fp:
             x = line[:-1]
             columns_names.append(x)
@@ -34,7 +34,7 @@ def get_columns():
 # get all dates in use (3 years between 01/05/2019 to 01/05/2022
 def get_dates():
     dates_list = []
-    with open('dates.txt', 'r') as fp:
+    with open('./data/dates.txt', 'r') as fp:
         for line in fp:
             x = line[:-1]
             dates_list.append(x)
@@ -44,7 +44,7 @@ def get_dates():
 # get the list of all tickers in the S&P that we need to iterate through
 def get_tickers():
     stocks_tickers = []
-    with open('tickers.txt', 'r') as fp:
+    with open('./data/tickers.txt', 'r') as fp:
         for line in fp:
             x = line[:-1]
             stocks_tickers.append(x)
