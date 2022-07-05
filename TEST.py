@@ -19,6 +19,14 @@ END = "2022-05-01"
 INTERVAL = '1d'
 
 
+def perchange (ticker,start_date,end_date):
+    stock = yf.Ticker(ticker)
+    df_sp = stock.history(start=START, end=END, interval=INTERVAL)
+    df['Open Change'] = df['Open'] / df['Open'].shift(1) - 1
+    df['Close Change'] = df['Close'] / df['Close'].shift(1) - 1
+    df['PriceUp'] = np.where(df['DPC'] > 0, 1, 0)
+    df['PriceDown'] = np.where(df['DPC'] < 0, 1, 0)
+
 def windownormdist_normalization(list):
     normalized_data,sublist = [],[]
     m, std = 0,0

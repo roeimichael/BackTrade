@@ -58,8 +58,7 @@ if __name__ == '__main__':
     tickers = get_tickers()
     dates = get_dates()
     columns = get_columns()
-
-    # runs the code itslef
+    # runs the code part by part
     scanner.main(tickers)
     normalization.normalization_main(tickers)
     datesEdit.dates_edit_main(tickers, dates, columns)
