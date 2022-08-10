@@ -14,6 +14,7 @@ INTERVAL = '1d'
 
 # creates the defulat s&p file where some information is taken
 def create_Sp500():
+    print("creating s&p 500 tickers file...")
     stock = yf.Ticker(SP500TICKER)
     df_sp = stock.history(start=START, end=END, interval=INTERVAL)
     df_sp = df_sp.drop(columns=['Dividends', 'Stock Splits'])
@@ -59,7 +60,7 @@ if __name__ == '__main__':
     dates = get_dates()
     columns = get_columns()
     # runs the code part by part
-    scanner.main(tickers)
-    normalization.normalization_main(tickers)
+    # scanner.main(tickers)
+    # normalization.normalization_main(tickers)
     datesEdit.dates_edit_main(tickers, dates, columns)
     concatnation.concatanation_main(dates)

@@ -18,6 +18,7 @@ TARGET_THREASHOLD = 0.025
 
 # removes warnings
 simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
+simplefilter(action='ignore', category=FutureWarning)
 # takes a list of all candle names
 candle_names = talib.get_function_groups()['Pattern Recognition']
 
@@ -92,7 +93,7 @@ def add_other(df):
 
 
 # a support function created to see if all the files are in place.
-def check_data():
+def check_data(tickers):
     onlyfiles = [f for f in listdir("./data/stocks/") if isfile(join("./data/stocks/", f))]
     print(len(onlyfiles))
     print(len(tickers))

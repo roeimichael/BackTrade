@@ -5,7 +5,7 @@ import numpy as np
 WINDOWSIZE = 100
 not_normalized = ["ma200", "ma50", "TRIX", "stochK", "stochD", "TRANGE", "BBupperband", "BBmiddleband", "BBlowerband",
                   "ao", "cci", "coppock", "mom", "pgo", "alma", "dema", "wma", "fwma", "hma", "hwma", "jma", "kama",
-                  "mcgd", "pwma", "sinwma", "swma", "t3", "tema", "trima", "vidya", "vwma", "zlma", "qstick", "vhf",
+                  "mcgd", "pwma", "sinwma", "swma",  "tema", "trima","t3", "vidya", "vwma", "zlma", "qstick", "vhf",
                   "atr", "massi", "pdist", "rvi", "ui", "ad", "adosc", "cmf", "efi", "obv", "pvt", "Market Cap", "DPC",
                   "Cumulative Return"]
 normalized = ["ADX", "ADXR", "AROONOSC", "DX", "PPO", "ULTOSC", "MACD", "MACDSIG", "MACDHIS", "apo", "bias", "bop",
@@ -13,9 +13,9 @@ normalized = ["ADX", "ADXR", "AROONOSC", "DX", "PPO", "ULTOSC", "MACD", "MACDSIG
               "mfi", "pvr", "ebsw", "PriceUp", "PriceDown", "VIX", "VVIX", "VXN"]
 
 
-# a normalization method that is similar to the noremal distribution normalization only that this method uses a
-# window that moves along the cell currently normalized and the values caclulated to normalized are taken from the
-# cells in the windfow after the currenct cell
+# a normalization method that is similar to the normal distribution normalization only that this method uses a
+# window that moves along the cell currently normalized and the values calculated to normalized are taken from the
+# cells in the window after the current cell
 
 def windownormdist_normalization(list):
     normalized_data, sublist = [], []
@@ -26,8 +26,9 @@ def windownormdist_normalization(list):
         std = np.std(sublist, axis=0)
         normalized_data.append((list[i] - m) / std)
     for j in range(WINDOWSIZE):
-        normalized_data.append((list[j - 10] - m) / std)
+        normalized_data.append(None)
     return normalized_data
+
 
 
 # a normalization method that takes into account the tanh of the current cell value compared to others in the column.
@@ -76,15 +77,17 @@ def min_max_normalization(unnormalized_data):
 # the main function of the file which takes every ticker file and run on every unnormalized column and normalize it
 # with the aforementioned normalization method.
 def normalize_tickers(tickers):
+    print("normalizing all stocks dfs...")
     unavilable = []
     for index, ticker in enumerate(tickers):
         try:
-            print(f"currently at {index + 1} out of {len(tickers)}")
+            print(f"currently at {index + 1} stock {ticker} out of {len(tickers)}")
             df = pd.read_csv(f"./data/stocks/{ticker}.csv")
             for column in not_normalized:
                 unnormalized_data = df[f'{column}'].tolist()
                 normalized_data = windownormdist_normalization(unnormalized_data)
                 df[f'{column}'] = normalized_data
+            df = df.iloc[:-WINDOWSIZE, :]
             df.to_csv(f"./data/stocks/{ticker}.csv")
         except:
             unavilable.append(ticker)

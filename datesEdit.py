@@ -14,6 +14,7 @@ path = "c:/users/roeym/desktop/backtrade/data/dates/*.csv"
 
 # a side function created to remove columns that were accidently duplicated and needs to be removed.
 def clear_unnamed(dates):
+    print("removing unnamed columns...")
     for date in dates:
         df = pd.read_csv(f"./data/dates/{date}.csv")
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
@@ -23,6 +24,7 @@ def clear_unnamed(dates):
 # calculate the stocks that went up compared to the ones that went down at every day and than adds it as a column to
 # the data values.
 def get_advance_decline_ratio(dates, df_sp):
+    print("calculating advance decline ratio...")
     adr, add = [], []
     for date in dates:
         date_df = pd.read_csv(f"./data/dates/{date}.csv")
@@ -45,6 +47,7 @@ def get_advance_decline_ratio(dates, df_sp):
 # after the A/D ratio is calculated the mcclelan osc is an breath market indicator that takes into account moving
 # averages of the AD raio and generage a general picture of the market.
 def calc_mcclellan(dates):
+    print("calculating mcclellan indicator...")
     df = pd.read_csv(SNPPATH, index_col=[0])
     add = df['AD_difference']
     ema19 = ta.ema((add * 0.1), 19)
@@ -80,6 +83,7 @@ def get_high_corr(ticker, tickers):
 
 # creates the files of the dates so we have something to iterate in.
 def creating_dates(dates, columns):
+    print("creating dates files...")
     for date in dates:
         df = pd.DataFrame(columns=columns)
         df.to_csv(f"./data/dates/{date}.csv")
@@ -88,24 +92,27 @@ def creating_dates(dates, columns):
 # converts all the stocks that were already built and normalized and transfer each attribute in the stock file to all
 # 758 dates, loops through all the stocks and divides them up to all the dates.
 def stocks_to_dates(tickers, dates):
+    print("moving from stocks to dates files...")
     bad_stocks = []
     for index, ticker in enumerate(tickers):
-        try:
-            print(f"currently at {index + 1} out of {len(tickers)}")
-            ticker_df = pd.read_csv(f"./data/stocks/{ticker}.csv")
-            for date in dates:
-                curr_date_df = pd.read_csv(f"./data/dates/{date}.csv", index_col=[0])
-                row = ticker_df.loc[ticker_df['Date'] == date].values[0].tolist()[1:]
-                curr_date_df.loc[len(curr_date_df.index)] = row
-                curr_date_df.to_csv(f"./data/dates/{date}.csv")
-        except:
-            bad_stocks.append(ticker)
-    print(bad_stocks)
+        # try:
+        print(f"currently at {index + 1} stock {ticker} out of {len(tickers)}")
+        ticker_df = pd.read_csv(f"./data/stocks/{ticker}.csv")
+        for date in dates:
+            print(date)
+            curr_date_df = pd.read_csv(f"./data/dates/{date}.csv", index_col=[0])
+            row = ticker_df.loc[ticker_df['Date'] == date].values[0].tolist()[1:]
+            curr_date_df.loc[len(curr_date_df.index)] = row
+            curr_date_df.to_csv(f"./data/dates/{date}.csv")
+    #     except:
+    #         bad_stocks.append(ticker)
+    # print(bad_stocks)
 
 
 # the main function that unionize all the functions in order that needs to be played in this part.
 def dates_edit_main(tickers, dates, columns):
     t1 = time.perf_counter()
+    dates = dates[:658] # removes 100 last days beacuse of normalization window
     df_sp = pd.read_csv(SNPPATH)
     columns.remove('Date')
     creating_dates(dates, columns)
