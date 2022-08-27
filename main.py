@@ -60,8 +60,8 @@ if __name__ == '__main__':
     dates = get_dates()
     columns = get_columns()
     # runs the code part by part
-    scanner.main(tickers)
-    normalization.normalization_main(tickers)
+    # scanner.main(tickers)
+    # normalization.normalization_main(tickers)
     dates = dates[:658]  # removes 100 last days beacuse of normalization window
-    datesEdit.dates_edit_main(tickers, dates, columns)
+    # datesEdit.dates_edit_main(tickers, dates, columns)
     concatnation.concatanation_main(dates)

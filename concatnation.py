@@ -19,7 +19,8 @@ def concatnate_date(windowsize, dates):
             temp_df = pd.read_csv(f"./data/dates/{reverseddates[i + j]}.csv")
             columns = temp_df.columns.values.tolist()
             for col in columns:
-                df[f"{col}-{j}"] = temp_df[col]
+                if col != "ticker":
+                    df[f"{col}-{j}"] = temp_df[col]
         df.to_csv(f"./data/dates/{reverseddates[i]}.csv")
 
 
@@ -35,7 +36,7 @@ def clear_unnamed(dates):
 # main function running the concatenation process
 def concatanation_main(dates):
     t1 = time.perf_counter()
-    concatnate_date(WINDOWSIZE, dates)
+    # concatnate_date(WINDOWSIZE, dates)
     clear_unnamed(dates)
     t2 = time.perf_counter()
     print(f'Finished concatanation_main in {t2 - t1} seconds')
