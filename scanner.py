@@ -121,6 +121,7 @@ def create_csv(ticker):
 # each thread a stock file is being created.
 def main(tickers):
     t1 = time.perf_counter()
+    print("creating basic files...")
     splits = np.array_split(tickers, SPLITS)
     with concurrent.futures.ProcessPoolExecutor() as executor:
         executor.map(create_threads, splits)

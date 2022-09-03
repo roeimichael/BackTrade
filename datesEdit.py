@@ -86,17 +86,17 @@ def stocks_to_dates(tickers, dates):
     print("moving from stocks to dates files...")
     bad_stocks = []
     for index, ticker in enumerate(tickers):
-        try:
-            print(f"currently at {index + 1} stock {ticker} out of {len(tickers)}")
-            ticker_df = pd.read_csv(f"./data/stocks/{ticker}.csv")
-            for date in dates:
-                curr_date_df = pd.read_csv(f"./data/dates/{date}.csv", index_col=[0])
-                row = ticker_df.loc[ticker_df['Date'] == date].values[0].tolist()[1:]
-                curr_date_df.loc[len(curr_date_df.index)] = row
-                curr_date_df.to_csv(f"./data/dates/{date}.csv")
-        except:
-            bad_stocks.append(ticker)
-    print(bad_stocks)
+        # try:
+        print(f"currently at {index + 1} stock {ticker} out of {len(tickers)}")
+        ticker_df = pd.read_csv(f"./data/stocks/{ticker}.csv")
+        for date in dates:
+            curr_date_df = pd.read_csv(f"./data/dates/{date}.csv", index_col=[0])
+            row = ticker_df.loc[ticker_df['Date'] == date].values[0].tolist()[1:]
+            curr_date_df.loc[len(curr_date_df.index)] = row
+            curr_date_df.to_csv(f"./data/dates/{date}.csv")
+        # except:
+    #         bad_stocks.append(ticker)
+    # print(bad_stocks)
 
 
 # the main function that unionize all the functions in order that needs to be played in this part.

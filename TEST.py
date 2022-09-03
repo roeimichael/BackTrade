@@ -1,15 +1,22 @@
-# import time
-# import concurrent.futures
-# import yfinance as yf
-# import numpy as np
-# import talib
-# import pandas as pd
-# import datesEdit as of
-# import pandas_ta as ta
-# from warnings import simplefilter
-# from os import listdir
-# from os.path import isfile, join
-#
+import time
+import concurrent.futures
+import numpy as np
+import talib
+import pandas as pd
+import datesEdit as of
+import pandas_ta as ta
+from warnings import simplefilter
+from os import listdir
+from os.path import isfile, join
+import yfinance as yf
+from bs4 import BeautifulSoup
+import requests
+import re
+
+START = "2019-05-01"
+END = "2022-05-01"
+INTERVAL = '1d'
+PERIOD = "3y"
 # WINDOWSIZE = 10
 # not_normalized = ["hwma", "jma", "kama", "mcgd", "pwma", "sinwma", "swma", "t3", "tema", "trima", "vidya", "vwma", "zlma", "qstick", "vhf",
 #                   "atr", "massi", "pdist", "rvi", "ui", "ad", "adosc", "cmf", "efi", "obv", "pvt", "Market Cap", "DPC",
@@ -40,9 +47,24 @@
 #     return normalized_data
 #
 #
-# if __name__ == '__main__':
-#     df = pd.read_csv(f"./data/stocks/AAPL_NOTNORM.csv")
-#     for column in not_normalized:
-#         unnormalized_data = df[f'{column}'].tolist()
-#         normalized_data = windownormdist_normalization(unnormalized_data)
-#         df[f'{column}'] = normalized_data
+
+if __name__ == '__main__':
+    # stock = yf.Ticker('ANTM')
+    # df = stock.history(start=START, end=END, interval=INTERVAL, prepost=False)
+    # df = df.drop(columns=['Stock Splits'])
+    # print(df)
+    # df = pd.read_csv(f"./data/stocks/AAPL_NOTNORM.csv")
+    # for column in not_normalized:
+    #     unnormalized_data = df[f'{column}'].tolist()
+    #     normalized_data = windownormdist_normalization(unnormalized_data)
+    #     df[f'{column}'] = normalized_data
+    def getdata(url):
+        r = requests.get(url)
+        return r.text
+
+    for i in range(45,500):
+        htmldata = getdata(f"http://justinmaller.com/wallpaper/{i}/")
+        soup = BeautifulSoup(htmldata, 'html.parser')
+        for item in soup.find_all('img'):
+            if len(item['src']) >= 70:
+                print(item['src'])

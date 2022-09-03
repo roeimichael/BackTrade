@@ -5,7 +5,7 @@ import numpy as np
 WINDOWSIZE = 100
 not_normalized = ["ma200", "ma50", "TRIX", "stochK", "stochD", "TRANGE", "BBupperband", "BBmiddleband", "BBlowerband",
                   "ao", "cci", "coppock", "mom", "pgo", "alma", "dema", "wma", "fwma", "hma", "hwma", "jma", "kama",
-                  "mcgd", "pwma", "sinwma", "swma",  "tema", "trima","t3", "vidya", "vwma", "zlma", "qstick", "vhf",
+                  "mcgd", "pwma", "sinwma", "swma", "tema", "trima", "t3", "vidya", "vwma", "zlma", "qstick", "vhf",
                   "atr", "massi", "pdist", "rvi", "ui", "ad", "adosc", "cmf", "efi", "obv", "pvt", "Market Cap", "DPC",
                   "Cumulative Return"]
 normalized = ["ADX", "ADXR", "AROONOSC", "DX", "PPO", "ULTOSC", "MACD", "MACDSIG", "MACDHIS", "apo", "bias", "bop",
@@ -30,7 +30,6 @@ def windownormdist_normalization(list):
     return normalized_data
 
 
-
 # a normalization method that takes into account the tanh of the current cell value compared to others in the column.
 # it is a pretty accurate normalization model.
 def tanh_normalization(unnormalized_data):
@@ -42,10 +41,10 @@ def tanh_normalization(unnormalized_data):
 
 # the normal distribution model is probably the most popular. it takes the mean and the standard deviation of the
 # column and normalize each cell by them.
-def normdist_normalization(unnormalized_data):
-    m = np.mean(unnormalized_data, axis=0)
-    std = np.std(unnormalized_data, axis=0)
-    normalized_data = (unnormalized_data - m) / std
+def normdist_normalization(unnormalized_data_1):
+    m = np.nanmean(unnormalized_data_1)
+    std = np.nanstd(unnormalized_data_1)
+    normalized_data = (unnormalized_data_1 - m) / std
     return normalized_data
 
 

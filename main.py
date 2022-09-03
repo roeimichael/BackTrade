@@ -55,13 +55,13 @@ def get_tickers():
 # runs all the files one after the other to complete the data
 if __name__ == '__main__':
     # gets needed data
-    create_Sp500()
+    # create_Sp500()
     tickers = get_tickers()
     dates = get_dates()
     columns = get_columns()
     # runs the code part by part
-    # scanner.main(tickers)
-    # normalization.normalization_main(tickers)
+    scanner.main(tickers)
+    normalization.normalization_main(tickers)
     dates = dates[:658]  # removes 100 last days beacuse of normalization window
-    # datesEdit.dates_edit_main(tickers, dates, columns)
+    datesEdit.dates_edit_main(tickers, dates, columns)
     concatnation.concatanation_main(dates)
