@@ -12,7 +12,9 @@ END = "2022-05-01"
 INTERVAL = '1d'
 
 
-# creates the defulat s&p file where some information is taken
+# input: none.
+# output: data frame containing all the tickers of the s&p with basic information.
+# the function calls for YF to get the information about the S&p iteslf.
 def create_Sp500():
     print("creating s&p 500 tickers file...")
     stock = yf.Ticker(SP500TICKER)
@@ -22,7 +24,9 @@ def create_Sp500():
     return df_sp
 
 
-# gets the list of all columns used in the project
+# input: none.
+# output: list of all columns that are used in the data.
+# the function reads from a premade file all the columns and puts them in a list.
 def get_columns():
     columns_names = []
     with open('./data/columns.txt', 'r') as fp:
@@ -32,7 +36,9 @@ def get_columns():
     return columns_names
 
 
-# get all dates in use (3 years between 01/05/2019 to 01/05/2022
+# input: none.
+# output: list of all dates that are used to receive the data.
+# get all dates in use (3 years between 01/05/2019 to 01/05/2022).
 def get_dates():
     dates_list = []
     with open('./data/dates.txt', 'r') as fp:
@@ -42,7 +48,9 @@ def get_dates():
     return dates_list
 
 
-# get the list of all tickers in the S&P that we need to iterate through
+# input: none.
+# output: list of all tickers in the S&P500 index.
+# the function reads from a premade file all the tickers and puts them in a list.
 def get_tickers():
     stocks_tickers = []
     with open('./data/tickers.txt', 'r') as fp:
@@ -52,16 +60,18 @@ def get_tickers():
     return stocks_tickers
 
 
-# runs all the files one after the other to complete the data
+# input: none.
+# output: none.
+# this is the main function of the project it runs every other operation to create the final data.
 if __name__ == '__main__':
     # gets needed data
-    # create_Sp500()
+    create_Sp500()
     tickers = get_tickers()
     dates = get_dates()
     columns = get_columns()
     # runs the code part by part
-    scanner.main(tickers)
-    normalization.normalization_main(tickers)
+    # scanner.main(tickers)
+    # normalization.normalization_main(tickers)
     dates = dates[:658]  # removes 100 last days beacuse of normalization window
     datesEdit.dates_edit_main(tickers, dates, columns)
     concatnation.concatanation_main(dates)

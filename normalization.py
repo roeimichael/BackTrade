@@ -13,13 +13,14 @@ normalized = ["ADX", "ADXR", "AROONOSC", "DX", "PPO", "ULTOSC", "MACD", "MACDSIG
               "mfi", "pvr", "ebsw", "PriceUp", "PriceDown", "VIX", "VVIX", "VXN"]
 
 
+# input: list of unnormalized column.
+# output: list of normalized column.
 # a normalization method that is similar to the normal distribution normalization only that this method uses a
 # window that moves along the cell currently normalized and the values calculated to normalized are taken from the
 # cells in the window after the current cell
 
 def windownormdist_normalization(list):
     normalized_data, sublist = [], []
-    m, std = 0, 0
     for i in range(len(list) - WINDOWSIZE):
         sublist = list[i:i + WINDOWSIZE]
         m = np.mean(sublist, axis=0)
@@ -30,6 +31,8 @@ def windownormdist_normalization(list):
     return normalized_data
 
 
+# input: list of unnormalized column.
+# output: list of normalized column.
 # a normalization method that takes into account the tanh of the current cell value compared to others in the column.
 # it is a pretty accurate normalization model.
 def tanh_normalization(unnormalized_data):
@@ -39,6 +42,8 @@ def tanh_normalization(unnormalized_data):
     return normalized_data
 
 
+# input: list of unnormalized column.
+# output: list of normalized column.
 # the normal distribution model is probably the most popular. it takes the mean and the standard deviation of the
 # column and normalize each cell by them.
 def normdist_normalization(unnormalized_data_1):
@@ -48,6 +53,8 @@ def normdist_normalization(unnormalized_data_1):
     return normalized_data
 
 
+# input: list of unnormalized column.
+# output: list of normalized column.
 # sigmoid normalization takes the sigmoid function 1/(1+e^-x) and outputs the normalized column back with values
 # between 0 and 1 depending on the strength of the input data to the function.
 def sigmoid_normalization(unnormalized_data):
@@ -57,6 +64,8 @@ def sigmoid_normalization(unnormalized_data):
     return normalized_data
 
 
+# input: list of unnormalized column.
+# output: list of normalized column.
 # median normalization takes into a count only the median of the entered data and normalize it by deviding each cell
 # by it. not so accurate and probably will only used experimentally
 def median_normalization(unnormalized_data):
@@ -65,6 +74,8 @@ def median_normalization(unnormalized_data):
     return normalized_data
 
 
+# input: list of unnormalized column.
+# output: list of normalized column.
 # min max normalization is also a very popular method the one i created output values between 0 and 1 wheh the
 # highest value in the input column will return as one and vise versa for the lowest value as 0. the model is pretty
 # accurate and will be used in the future.
@@ -73,6 +84,8 @@ def min_max_normalization(unnormalized_data):
     return normalized_data
 
 
+# input: list of tickers.
+# output: none.
 # the main function of the file which takes every ticker file and run on every unnormalized column and normalize it
 # with the aforementioned normalization method.
 def normalize_tickers(tickers):
@@ -93,7 +106,8 @@ def normalize_tickers(tickers):
     print(unavilable)
 
 
-# defualt main function to run the functions required as one.
+# input: list of tickers. output: none. defualt main function to run the funcions and measure time (right now only
+# runs one function but created incase other functiuons will be needed).
 def normalization_main(tickers):
     t1 = time.perf_counter()
     normalize_tickers(tickers)

@@ -12,6 +12,8 @@ SNPPATH = "S&P500.csv"
 path = "c:/users/roeym/desktop/backtrade/data/dates/*.csv"
 
 
+# input: list of dates , S&P tickers file.
+# output: none.
 # calculate the stocks that went up compared to the ones that went down at every day and than adds it as a column to
 # the data values.
 def get_advance_decline_ratio(dates, df_sp):
@@ -35,6 +37,8 @@ def get_advance_decline_ratio(dates, df_sp):
     df_sp.to_csv(SNPPATH)
 
 
+# input: list of dates.
+# output: none.
 # after the A/D ratio is calculated the mcclelan osc is an breath market indicator that takes into account moving
 # averages of the AD raio and generage a general picture of the market.
 def calc_mcclellan(dates):
@@ -56,9 +60,9 @@ def calc_mcclellan(dates):
             curr_df.to_csv(f"./data/dates/{date}.csv")
 
 
-# a function currently not in used that will later be added to the project that measures teh level of correlation
-# between each stock with other stocks it adds the closing prices of the top 3 highest correlated stocks as columns
-# for the data of the input stock
+# input: list of all the tickers, and a specific ticker.
+# output: list of 3 tickers.
+# the function calculates the top 3 highest correlated tickers to the specific one inserted and returns them.
 def get_high_corr(ticker, tickers):
     req_df = pd.read_csv(f"./data/stocks/{ticker}.csv")
     req_close = req_df['Close']
@@ -72,7 +76,9 @@ def get_high_corr(ticker, tickers):
     return [x[1] for x in top3]
 
 
-# creates the files of the dates so we have something to iterate in.
+# input: list of dates, list of columns (data columns).
+# output: none.
+# the function creates all the empty dates files.
 def creating_dates(dates, columns):
     print("creating dates files...")
     for date in dates:
@@ -80,26 +86,30 @@ def creating_dates(dates, columns):
         df.to_csv(f"./data/dates/{date}.csv")
 
 
+# input: list of dates, list of tickers.
+# output: none.
 # converts all the stocks that were already built and normalized and transfer each attribute in the stock file to all
 # 758 dates, loops through all the stocks and divides them up to all the dates.
 def stocks_to_dates(tickers, dates):
     print("moving from stocks to dates files...")
     bad_stocks = []
     for index, ticker in enumerate(tickers):
-        # try:
-        print(f"currently at {index + 1} stock {ticker} out of {len(tickers)}")
-        ticker_df = pd.read_csv(f"./data/stocks/{ticker}.csv")
-        for date in dates:
-            curr_date_df = pd.read_csv(f"./data/dates/{date}.csv", index_col=[0])
-            row = ticker_df.loc[ticker_df['Date'] == date].values[0].tolist()[1:]
-            curr_date_df.loc[len(curr_date_df.index)] = row
-            curr_date_df.to_csv(f"./data/dates/{date}.csv")
-        # except:
-    #         bad_stocks.append(ticker)
-    # print(bad_stocks)
+        try:
+            print(f"currently at {index + 1} stock {ticker} out of {len(tickers)}")
+            ticker_df = pd.read_csv(f"./data/stocks/{ticker}.csv")
+            for date in dates:
+                curr_date_df = pd.read_csv(f"./data/dates/{date}.csv", index_col=[0])
+                row = ticker_df.loc[ticker_df['Date'] == date].values[0].tolist()[1:]
+                curr_date_df.loc[len(curr_date_df.index)] = row
+                curr_date_df.to_csv(f"./data/dates/{date}.csv")
+        except:
+            bad_stocks.append(ticker)
+    print(bad_stocks)
 
 
-# the main function that unionize all the functions in order that needs to be played in this part.
+# input: list of dates, list of tickers, list of columns.
+# output: none.
+# the main function that unionize all the functions in order that needs to be ran in this part of the code.
 def dates_edit_main(tickers, dates, columns):
     t1 = time.perf_counter()
     df_sp = pd.read_csv(SNPPATH)

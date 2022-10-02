@@ -32,13 +32,17 @@ vxn = yf.Ticker('^VXN')
 vxn = vxn.history(start=START, end=END, interval=INTERVAL)
 
 
-# adds all the candles to the data
+# input: data frame.
+# output: none.
+# adds all the candles (from talib) to the currently sent dataframe
 def add_candles(df):
     for candle in candle_names:
         df[candle] = getattr(talib, candle)(df['Open'], df['High'], df['Low'], df['Close'])
 
 
-# adds all the technical indicators to the data (taken from talib and pandas_ta)
+# input: data frame.
+# output: none.
+# adds all the technical indicators to the data (taken from talib and pandas_ta) and format the basic data frame.
 def add_indicators(df):
     df['ma50'] = df['Open'].rolling(50).mean()
     df['ma200'] = df['Open'].rolling(200).mean()
@@ -78,6 +82,8 @@ def add_indicators(df):
             print(f"the problame is in indicator : {indicator}, {name}")
 
 
+# input: data frame.
+# output: none.
 # adds other types of information to the data, and the target column.
 def add_other(df):
     df['VIX'] = vix['Close']
@@ -92,6 +98,8 @@ def add_other(df):
     df['Target'] = np.where(df['Close Change'] > TARGET_THREASHOLD, 1, 0)
 
 
+# input: list of tickers.
+# output: none.
 # a support function created to see if all the files are in place.
 def check_data(tickers):
     onlyfiles = [f for f in listdir("./data/stocks/") if isfile(join("./data/stocks/", f))]
@@ -99,12 +107,16 @@ def check_data(tickers):
     print(len(tickers))
 
 
+# input: list of splits.
+# output: none.
 # creates the thread for the scanner to run on
 def create_threads(splits):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(create_csv, splits)
 
 
+# input: list of tickers.
+# output: none.
 # creats each individual csv and call the data filling functions for that stock.
 def create_csv(ticker):
     stock = yf.Ticker(ticker)
@@ -117,6 +129,8 @@ def create_csv(ticker):
     df.to_csv(f"./data/stocks/{ticker}.csv")
 
 
+# input: list of tickers.
+# output: none.
 # creates multiprocesses for the data to be divided on and each multiproccess is than being divided to threads and on
 # each thread a stock file is being created.
 def main(tickers):
@@ -127,6 +141,3 @@ def main(tickers):
         executor.map(create_threads, splits)
     t2 = time.perf_counter()
     print(f'Finished in {t2 - t1} seconds')
-
-
-

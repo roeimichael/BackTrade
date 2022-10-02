@@ -9,62 +9,15 @@ from warnings import simplefilter
 from os import listdir
 from os.path import isfile, join
 import yfinance as yf
-from bs4 import BeautifulSoup
-import requests
-import re
 
 START = "2019-05-01"
 END = "2022-05-01"
 INTERVAL = '1d'
 PERIOD = "3y"
-# WINDOWSIZE = 10
-# not_normalized = ["hwma", "jma", "kama", "mcgd", "pwma", "sinwma", "swma", "t3", "tema", "trima", "vidya", "vwma", "zlma", "qstick", "vhf",
-#                   "atr", "massi", "pdist", "rvi", "ui", "ad", "adosc", "cmf", "efi", "obv", "pvt", "Market Cap", "DPC",
-#                   "Cumulative Return"]
-# START = "2019-05-01"
-# END = "2022-05-01"
-# INTERVAL = '1d'
-#
-#
-# def perchange (ticker,start_date,end_date):
-#     stock = yf.Ticker(ticker)
-#     df_sp = stock.history(start=START, end=END, interval=INTERVAL)
-#     df['Open Change'] = df['Open'] / df['Open'].shift(1) - 1
-#     df['Close Change'] = df['Close'] / df['Close'].shift(1) - 1
-#     df['PriceUp'] = np.where(df['DPC'] > 0, 1, 0)
-#     df['PriceDown'] = np.where(df['DPC'] < 0, 1, 0)
-#
-# def windownormdist_normalization(list):
-#     normalized_data,sublist = [],[]
-#     m, std = 0,0
-#     for i in range(len(list) - WINDOWSIZE):
-#         sublist = list[i:i + WINDOWSIZE]
-#         m = np.mean(sublist, axis=0)
-#         std = np.std(sublist, axis=0)
-#         normalized_data.append((list[i] - m) / std)
-#     for j in range(WINDOWSIZE):
-#         normalized_data.append((list[j-10] - m) / std)
-#     return normalized_data
-#
-#
+WINDOWSIZE = 10
 
 if __name__ == '__main__':
     # stock = yf.Ticker('ANTM')
     # df = stock.history(start=START, end=END, interval=INTERVAL, prepost=False)
     # df = df.drop(columns=['Stock Splits'])
     # print(df)
-    # df = pd.read_csv(f"./data/stocks/AAPL_NOTNORM.csv")
-    # for column in not_normalized:
-    #     unnormalized_data = df[f'{column}'].tolist()
-    #     normalized_data = windownormdist_normalization(unnormalized_data)
-    #     df[f'{column}'] = normalized_data
-    def getdata(url):
-        r = requests.get(url)
-        return r.text
-
-    for i in range(45,500):
-        htmldata = getdata(f"http://justinmaller.com/wallpaper/{i}/")
-        soup = BeautifulSoup(htmldata, 'html.parser')
-        for item in soup.find_all('img'):
-            if len(item['src']) >= 70:
-                print(item['src'])

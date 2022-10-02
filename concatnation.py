@@ -6,6 +6,8 @@ WINDOWSIZE = 10
 simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 
 
+# input: list of dates.
+# output: none.
 # concatenate the last Window_size dates following each date in the list so that the bot can recive updates information
 # of the last 10 dates.
 def concatnate_date(dates):
@@ -23,7 +25,9 @@ def concatnate_date(dates):
         df.to_csv(f"./data/dates/{reverseddates[i]}.csv")
 
 
-# a side function created to remove columns that were accidently duplicated and needs to be removed.
+# input: list of dates.
+# output: none.
+# a side function created to remove columns that were accidentally duplicated and needs to be removed.
 def clear_unnamed(dates):
     print("removing unnamed columns...")
     for date in dates:
@@ -32,7 +36,9 @@ def clear_unnamed(dates):
         df.to_csv(f"./data/dates/{date}.csv")
 
 
-# main function running the concatenation process
+# input: list of dates.
+# output: none.
+# main function running the concatenation process.
 def concatanation_main(dates):
     t1 = time.perf_counter()
     concatnate_date(dates)
