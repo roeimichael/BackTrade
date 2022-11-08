@@ -17,7 +17,18 @@ PERIOD = "3y"
 WINDOWSIZE = 10
 
 if __name__ == '__main__':
-    # stock = yf.Ticker('ANTM')
-    # df = stock.history(start=START, end=END, interval=INTERVAL, prepost=False)
-    # df = df.drop(columns=['Stock Splits'])
-    # print(df)
+    tickers = []
+    with open('./data/tickers.txt', 'r') as fp:
+        for line in fp:
+            x = line[:-1]
+            tickers.append(x)
+    tickers.append('^GSPC')
+    data = yf.download(tickers[:100], end='2022-01-01', start='2017-01-01', interval='1mo')['Adj Close']
+
+
+    print(data.head(10))
+    # log_returns = np.log(data / data.shift())
+    # cov = log_returns.cov()
+    # var = log_returns['^GSPC'].var()
+    # for tick in tickers:
+    #     print(f"{cov.loc[tick, '^GSPC'] / var} is b for {tick}")
