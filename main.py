@@ -2,8 +2,8 @@ import concatnation
 import scanner
 import normalization
 import datesEdit
-import pandas as pd
 import yfinance as yf
+import time
 
 STOCKSCSV = "Stocks in the SP 500 Index.csv"
 SP500TICKER = "^GSPC"
@@ -35,6 +35,14 @@ def get_columns():
             columns_names.append(x)
     return columns_names
 
+def get_small_columns():
+    columns_part_names = []
+    with open('./data/columns_small.txt', 'r') as fp:
+        for line in fp:
+            x = line[:-1]
+            columns_part_names.append(x)
+    return columns_part_names
+
 
 # input: none.
 # output: list of all dates that are used to receive the data.
@@ -65,13 +73,16 @@ def get_tickers():
 # this is the main function of the project it runs every other operation to create the final data.
 if __name__ == '__main__':
     # gets needed data
+    t1 = time.perf_counter()
     create_Sp500()
     tickers = get_tickers()
     dates = get_dates()
-    columns = get_columns()
+    columns = get_small_columns()
     # runs the code part by part
     # scanner.main(tickers)
     # normalization.normalization_main(tickers)
     dates = dates[:658]  # removes 100 last days beacuse of normalization window
     datesEdit.dates_edit_main(tickers, dates, columns)
     concatnation.concatanation_main(dates)
+    t2 = time.perf_counter()
+    print(f'Finished concatanation_main in {t2 - t1} seconds')

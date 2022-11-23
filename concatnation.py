@@ -41,6 +41,7 @@ def clear_unnamed(dates):
 # main function running the concatenation process.
 def concatanation_main(dates):
     t1 = time.perf_counter()
+    clear_unnamed(dates)
     concatnate_date(dates)
     clear_unnamed(dates)
     t2 = time.perf_counter()

@@ -1,14 +1,13 @@
 import time
 import concurrent.futures
-import numpy as np
-import talib
+from pandas_ta import *
+import yfinance as yf
+
 import pandas as pd
-import datesEdit as of
-import pandas_ta as ta
 from warnings import simplefilter
 from os import listdir
 from os.path import isfile, join
-import yfinance as yf
+
 
 START = "2019-05-01"
 END = "2022-05-01"
@@ -22,11 +21,11 @@ if __name__ == '__main__':
         for line in fp:
             x = line[:-1]
             tickers.append(x)
-    tickers.append('^GSPC')
-    data = yf.download(tickers[:100], end='2022-01-01', start='2017-01-01', interval='1mo')['Adj Close']
+    vvix = yf.Ticker('^VVIX')
+    vvix = vvix.history(start=START, end=END, interval=INTERVAL)
 
 
-    print(data.head(10))
+    print(vvix.head(455))
     # log_returns = np.log(data / data.shift())
     # cov = log_returns.cov()
     # var = log_returns['^GSPC'].var()

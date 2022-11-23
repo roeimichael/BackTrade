@@ -1,8 +1,6 @@
 import pandas as pd
-import yfinance as yf
 import time
 import pandas_ta as ta
-import glob
 
 START = "2019-05-01"
 END = "2022-05-01"
@@ -22,7 +20,7 @@ def get_advance_decline_ratio(dates, df_sp):
     for date in dates:
         date_df = pd.read_csv(f"./data/dates/{date}.csv")
         advance = (date_df['PriceUp'] == 1).sum()
-        decline = (date_df['PriceDown'] == 1).sum()
+        decline = (date_df['PriceUp'] == -1).sum()
         if decline == 0:
             decline = 0.0000000000001
         ad_ratio = advance / decline
@@ -58,7 +56,7 @@ def calc_mcclellan(dates):
             curr_df['mcclellanSUM'] = mcclellansum[index]
             curr_df['mcclellanOSC'] = mcclellanosc[index]
             curr_df.to_csv(f"./data/dates/{date}.csv")
-
+    df = df.reindex(columns = [col for col in df.columns if col != 'Target'] + ['Target'])
 
 # input: list of all the tickers, and a specific ticker.
 # output: list of 3 tickers.
@@ -99,7 +97,10 @@ def stocks_to_dates(tickers, dates):
             ticker_df = pd.read_csv(f"./data/stocks/{ticker}.csv")
             for date in dates:
                 curr_date_df = pd.read_csv(f"./data/dates/{date}.csv", index_col=[0])
-                row = ticker_df.loc[ticker_df['Date'] == date].values[0].tolist()[1:]
+                # print(curr_date_df.columns.tolist())
+                # print(ticker_df.columns.tolist()[2:])
+                # exit()
+                row = ticker_df.loc[ticker_df['Date'] == date].values[0].tolist()[2:]
                 curr_date_df.loc[len(curr_date_df.index)] = row
                 curr_date_df.to_csv(f"./data/dates/{date}.csv")
         except:
@@ -114,7 +115,7 @@ def dates_edit_main(tickers, dates, columns):
     t1 = time.perf_counter()
     df_sp = pd.read_csv(SNPPATH)
     df_sp = df_sp.iloc[:-100, :]
-    columns.remove('Date')
+    # columns.remove('Date')
     creating_dates(dates, columns)
     stocks_to_dates(tickers, dates)
     get_advance_decline_ratio(dates, df_sp)

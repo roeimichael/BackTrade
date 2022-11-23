@@ -12,6 +12,9 @@ normalized = ["ADX", "ADXR", "AROONOSC", "DX", "PPO", "ULTOSC", "MACD", "MACDSIG
               "cfo", "cmo", "cti", "inertia", "psl", "roc", "rsi", "rsx", "willr", "chop", "increasing", "decreasing",
               "mfi", "pvr", "ebsw", "PriceUp", "PriceDown", "VIX", "VVIX", "VXN"]
 
+not_normalized_small = ["ma50", "ma200", "TRIX", "stochK", "stochD", "TRANGE", "BBupperband", "BBmiddleband",
+                        "BBlowerband","cci", "mom","wma",  "tema", "atr", "rvi", "Market Cap", "DPC", "Cumulative Return"]
+
 
 # input: list of unnormalized column.
 # output: list of normalized column.
@@ -95,7 +98,7 @@ def normalize_tickers(tickers):
         try:
             print(f"currently at {index + 1} stock {ticker} out of {len(tickers)}")
             df = pd.read_csv(f"./data/stocks/{ticker}.csv")
-            for column in not_normalized:
+            for column in not_normalized_small:
                 unnormalized_data = df[f'{column}'].tolist()
                 normalized_data = windownormdist_normalization(unnormalized_data)
                 df[f'{column}'] = normalized_data
