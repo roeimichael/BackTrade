@@ -61,14 +61,14 @@ def add_indicators(df):
                   df.ta.rsi(), df.ta.rsx(), df.ta.willr(), df.ta.alma(), df.ta.dema(),
                   df.ta.wma(), df.ta.fwma(), df.ta.hma(), df.ta.hwma(), df.ta.jma(), df.ta.kama(),
                   df.ta.pwma(), df.ta.sinwma(), df.ta.swma(), df.ta.t3(),
-                  df.ta.tema(), df.ta.trima(), df.ta.vidya(), df.ta.vwma(), df.ta.zlma(), df.ta.chop(),
+                  df.ta.tema(), df.ta.trima(),  df.ta.vwma(), df.ta.zlma(), df.ta.chop(),
                   df.ta.increasing(), df.ta.decreasing(), df.ta.qstick(), df.ta.vhf(), df.ta.atr(),
                   df.ta.massi(), df.ta.pdist(), df.ta.rvi(), df.ta.ui(), df.ta.ad(), df.ta.adosc(),
                   df.ta.cmf(), df.ta.efi(), df.ta.mfi(), df.ta.obv(), df.ta.pvr(), df.ta.pvt(),
                   df.ta.ebsw()]
     names = ['ao', 'apo', 'bias', 'bop', 'cci', 'cfo', 'cmo', 'coppock', 'cti', 'inertia', 'mom', 'pgo', 'psl',
              'roc', 'rsi', 'rsx', 'willr', 'alma', 'dema', 'wma', 'fwma', 'hma', 'hwma', 'jma', 'kama',
-             'pwma', 'sinwma', 'swma', 't3', 'tema', 'trima', 'vidya', 'vwma', 'zlma', 'chop',
+             'pwma', 'sinwma', 'swma', 't3', 'tema', 'trima',  'vwma', 'zlma', 'chop',
              'increasing', 'decreasing', 'qstick', 'vhf', 'atr', 'massi', 'pdist', 'rvi',
              'ui', 'ad', 'adosc', 'cmf', 'efi', 'mfi', 'obv', 'pvr', 'pvt', 'ebsw', ]
 

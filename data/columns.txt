@@ -111,7 +111,6 @@ swma
 t3
 tema
 trima
-vidya
 vwma
 zlma
 chop
