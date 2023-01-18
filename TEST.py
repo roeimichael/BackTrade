@@ -1,48 +1,49 @@
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
+import os
+from openpyxl.styles import PatternFill
+from openpyxl import load_workbook
 
-date_df = pd.read_csv("./data/dates/2021-10-26.csv")
-next_date_df = pd.read_csv("./data/dates/2021-10-27.csv")
-target_df = pd.read_csv("./data/Targets.csv")
 
-X_train = date_df.drop(['ticker'], axis=1)  # the current day data
-X_test = next_date_df.drop(['ticker'], axis=1)  # next day data
-y_train = target_df['2021-10-27']  # takes the next day target
-y_validate = target_df['2021-10-28']  # day after the next target
-clf = DecisionTreeClassifier(max_depth=5)
-clf.fit(X_train, y_train)
-y_pred = clf.predict(X_test)
+def color_columns(file_path):
+    # Load the Excel file
+    wb = load_workbook(file_path)
+    sheet = wb.active
 
-n_nodes = clf.tree_.node_count
-children_left = clf.tree_.children_left
-children_right = clf.tree_.children_right
-feature = clf.tree_.feature
-threshold = clf.tree_.threshold
+    # Create a dictionary of different colors for the column headers based on file name
+    colors = {'5': '0000FF', '20': '00FF00', '50': 'FFFF00', '100': 'FF00FF'}
 
-node_indicator = clf.decision_path(X_test)
-print(node_indicator)
-leave_id = clf.apply(X_test)
+    # Iterate through all columns
+    for col in sheet.iter_cols():
+        # Get the file ending from the column header
+        file_ending = col[0].value.split('_')[-1]
+        color = colors.get(file_ending)
 
-sample_id = 0
-node_index = node_indicator.indices[node_indicator.indptr[sample_id]:
-                                    node_indicator.indptr[sample_id + 1]]
-print('Rules used to predict sample %s: ' % sample_id)
-for node_id in node_index:
+        # Apply the color for the current file to the column headers
+        for cell in col:
+            cell.fill = PatternFill(start_color=color, end_color=color, fill_type="solid")
 
-    if leave_id[sample_id] == node_id:  # <-- changed != to ==
-        # continue # <-- comment out
-        print("leaf node {} reached, no decision here".format(leave_id[sample_id]))  # <--
+    wb.save(file_path)
 
-    else:  # < -- added else to iterate through decision nodes
-        if X_test[sample_id, feature[node_id]] <= threshold[node_id]:
-            threshold_sign = "<="
-        else:
-            threshold_sign = ">"
 
-        print("decision id node %s : (X[%s, %s] (= %s) %s %s)"
-              % (node_id,
-                 sample_id,
-                 feature[node_id],
-                 X_test[sample_id, feature[node_id]],  # <-- changed i to sample_id
-                 threshold_sign,
-                 threshold[node_id]))
+import pandas as pd
+import os
+
+
+def combine_csv_files(folder_path):
+    # Initialize empty list to store all data
+    dataframes = []
+    # Iterate through all CSV files in the folder
+    for csv_file in os.listdir(folder_path):
+        if csv_file.endswith('.csv'):
+            file_path = os.path.join(folder_path, csv_file)
+            # Read the CSV file and only select the first 3 columns
+            temp_df = pd.read_csv(file_path, usecols=[0, 1, 2])
+            # Append the data to the list
+            dataframes.append((temp_df, csv_file))
+    # Combine the dataframes using pd.concat()
+    df = pd.concat([x[0] for x in dataframes], axis=1, keys=[x[1] for x in dataframes])
+    # Save the combined dataframe to a new CSV file
+    df.to_csv(os.path.join(folder_path, 'final.csv'), index=False)
+
+
+combine_csv_files('./data/PrecisionTesting/2.5/')

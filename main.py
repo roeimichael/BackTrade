@@ -79,10 +79,10 @@ if __name__ == '__main__':
     dates = get_dates()
     columns = get_small_columns()
     # runs the code part by part
-    # scanner.main(tickers)
-    # normalization.normalization_main(tickers)
+    scanner.main(tickers)
+    normalization.normalization_main(tickers)
     dates = dates[:658]  # removes 100 last days beacuse of normalization window
     datesEdit.dates_edit_main(tickers, dates, columns)
     concatnation.concatanation_main(dates)
     t2 = time.perf_counter()
-    print(f'Finished concatanation_main in {t2 - t1} seconds')
+    print(f'Finished main in {t2 - t1} seconds')

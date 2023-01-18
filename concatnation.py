@@ -15,14 +15,14 @@ def concatnate_date(dates):
     reverseddates = dates[::-1]
     for i in range(len(reverseddates)-WINDOWSIZE):
         print(f"currently at {i} date :{reverseddates[i]} out of {len(reverseddates)}")
-        df = pd.read_csv(f"./data/dates/{reverseddates[i]}.csv")
+        df = pd.read_csv(f"./data/dates2/{reverseddates[i]}.csv")
         for j in range(1, WINDOWSIZE + 1):
-            temp_df = pd.read_csv(f"./data/dates/{reverseddates[i + j]}.csv")
+            temp_df = pd.read_csv(f"./data/dates2/{reverseddates[i + j]}.csv")
             columns = temp_df.columns.values.tolist()
             for col in columns:
                 if col != "ticker" and col != "Unnamed":
                     df[f"{col}-{j}"] = temp_df[col]
-        df.to_csv(f"./data/dates/{reverseddates[i]}.csv")
+        df.to_csv(f"./data/dates2/{reverseddates[i]}.csv")
 
 
 # input: list of dates.
@@ -31,9 +31,9 @@ def concatnate_date(dates):
 def clear_unnamed(dates):
     print("removing unnamed columns...")
     for date in dates:
-        df = pd.read_csv(f"./data/dates/{date}.csv")
+        df = pd.read_csv(f"./data/dates2/{date}.csv")
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
-        df.to_csv(f"./data/dates/{date}.csv")
+        df.to_csv(f"./data/dates2/{date}.csv")
 
 
 # input: list of dates.

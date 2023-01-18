@@ -18,7 +18,7 @@ def get_advance_decline_ratio(dates, df_sp):
     print("calculating advance decline ratio...")
     adr, add = [], []
     for date in dates:
-        date_df = pd.read_csv(f"./data/dates/{date}.csv")
+        date_df = pd.read_csv(f"./data/dates2/{date}.csv")
         advance = (date_df['PriceUp'] == 1).sum()
         decline = (date_df['PriceUp'] == -1).sum()
         if decline == 0:
@@ -27,7 +27,7 @@ def get_advance_decline_ratio(dates, df_sp):
         ad_difference = advance - decline
         date_df['AD_difference'] = ad_difference
         date_df['AD_RATIO'] = ad_ratio
-        date_df.to_csv(f"./data/dates/{date}.csv")
+        date_df.to_csv(f"./data/dates2/{date}.csv")
         add.append(ad_difference)
         adr.append(ad_ratio)
     df_sp['AD_difference'] = add
@@ -51,12 +51,12 @@ def calc_mcclellan(dates):
     df['mcclellanSUM'] = mcclellansum
     df.to_csv(SNPPATH)
     for index, date in enumerate(dates):
+        curr_df = pd.read_csv(f"./data/dates2/{date}.csv")
+        df = df.reindex(columns=[col for col in df.columns if col != 'Target'] + ['Target'])
         if index >= 38:
-            curr_df = pd.read_csv(f"./data/dates/{date}.csv")
             curr_df['mcclellanSUM'] = mcclellansum[index]
             curr_df['mcclellanOSC'] = mcclellanosc[index]
-            curr_df.to_csv(f"./data/dates/{date}.csv")
-    df = df.reindex(columns = [col for col in df.columns if col != 'Target'] + ['Target'])
+        curr_df.to_csv(f"./data/dates2/{date}.csv")
 
 # input: list of all the tickers, and a specific ticker.
 # output: list of 3 tickers.
@@ -81,7 +81,7 @@ def creating_dates(dates, columns):
     print("creating dates files...")
     for date in dates:
         df = pd.DataFrame(columns=columns)
-        df.to_csv(f"./data/dates/{date}.csv")
+        df.to_csv(f"./data/dates2/{date}.csv")
 
 
 # input: list of dates, list of tickers.
@@ -96,13 +96,13 @@ def stocks_to_dates(tickers, dates):
             print(f"currently at {index + 1} stock {ticker} out of {len(tickers)}")
             ticker_df = pd.read_csv(f"./data/stocks/{ticker}.csv")
             for date in dates:
-                curr_date_df = pd.read_csv(f"./data/dates/{date}.csv", index_col=[0])
+                curr_date_df = pd.read_csv(f"./data/dates2/{date}.csv", index_col=[0])
                 # print(curr_date_df.columns.tolist())
                 # print(ticker_df.columns.tolist()[2:])
                 # exit()
                 row = ticker_df.loc[ticker_df['Date'] == date].values[0].tolist()[2:]
                 curr_date_df.loc[len(curr_date_df.index)] = row
-                curr_date_df.to_csv(f"./data/dates/{date}.csv")
+                curr_date_df.to_csv(f"./data/dates2/{date}.csv")
         except:
             bad_stocks.append(ticker)
     print(bad_stocks)
@@ -120,6 +120,5 @@ def dates_edit_main(tickers, dates, columns):
     stocks_to_dates(tickers, dates)
     get_advance_decline_ratio(dates, df_sp)
     calc_mcclellan(dates)
-
     t2 = time.perf_counter()
     print(f'Finished dates_edit_main in {t2 - t1} seconds')

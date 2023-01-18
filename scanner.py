@@ -13,7 +13,7 @@ END = "2022-05-01"
 INTERVAL = '1d'
 PERIOD = "3y"
 SPLITS = 25
-TARGET_THREASHOLD = 0.025
+TARGET_THREASHOLD = 0.02
 
 # removes warnings
 simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
