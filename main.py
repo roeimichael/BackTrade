@@ -1,10 +1,11 @@
-import concatnation
-import scanner
-import normalization
-import datesEdit
-import yfinance as yf
 import time
+import scanner
+import datesEdit
+import concatnation
+import normalization
+import yfinance as yf
 
+# Constants
 STOCKSCSV = "Stocks in the SP 500 Index.csv"
 SP500TICKER = "^GSPC"
 START = "2019-05-01"
@@ -12,77 +13,38 @@ END = "2022-05-01"
 INTERVAL = '1d'
 
 
-# input: none.
-# output: data frame containing all the tickers of the s&p with basic information.
-# the function calls for YF to get the information about the S&p iteslf.
-def create_Sp500():
-    print("creating s&p 500 tickers file...")
+# Create S&P 500 DataFrame
+def create_sp500():
+    print("Creating S&P 500 tickers file...")
     stock = yf.Ticker(SP500TICKER)
     df_sp = stock.history(start=START, end=END, interval=INTERVAL)
-    df_sp = df_sp.drop(columns=['Dividends', 'Stock Splits'])
-    df_sp.to_csv(f"S&P500.csv")
+    df_sp.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
+    df_sp.to_csv("S&P500.csv")
     return df_sp
 
 
-# input: none.
-# output: list of all columns that are used in the data.
-# the function reads from a premade file all the columns and puts them in a list.
-def get_columns():
-    columns_names = []
-    with open('./data/columns.txt', 'r') as fp:
-        for line in fp:
-            x = line[:-1]
-            columns_names.append(x)
-    return columns_names
-
-def get_small_columns():
-    columns_part_names = []
-    with open('./data/columns_small.txt', 'r') as fp:
-        for line in fp:
-            x = line[:-1]
-            columns_part_names.append(x)
-    return columns_part_names
+# Read columns from a file
+def read_columns(file_path):
+    with open(file_path, 'r') as file:
+        return [line.strip() for line in file]
 
 
-# input: none.
-# output: list of all dates that are used to receive the data.
-# get all dates in use (3 years between 01/05/2019 to 01/05/2022).
-def get_dates():
-    dates_list = []
-    with open('./data/dates.txt', 'r') as fp:
-        for line in fp:
-            x = line[:-1]
-            dates_list.append(x)
-    return dates_list
-
-
-# input: none.
-# output: list of all tickers in the S&P500 index.
-# the function reads from a premade file all the tickers and puts them in a list.
-def get_tickers():
-    stocks_tickers = []
-    with open('./data/tickers.txt', 'r') as fp:
-        for line in fp:
-            x = line[:-1]
-            stocks_tickers.append(x)
-    return stocks_tickers
-
-
-# input: none.
-# output: none.
-# this is the main function of the project it runs every other operation to create the final data.
+# Main function
 if __name__ == '__main__':
-    # gets needed data
     t1 = time.perf_counter()
-    create_Sp500()
-    tickers = get_tickers()
-    dates = get_dates()
-    columns = get_small_columns()
-    # runs the code part by part
+
+    # Get necessary data
+    create_sp500()
+    tickers = read_columns('./data/tickers.txt')
+    dates = read_columns('./data/dates.txt')
+    columns = read_columns('./data/columns_small.txt')
+
+    # Run the processing steps
     scanner.main(tickers)
     normalization.normalization_main(tickers)
-    dates = dates[:658]  # removes 100 last days beacuse of normalization window
+    dates = dates[:658]  # Remove the last 100 days because of normalization window
     datesEdit.dates_edit_main(tickers, dates, columns)
     concatnation.concatanation_main(dates)
+
     t2 = time.perf_counter()
     print(f'Finished main in {t2 - t1} seconds')

@@ -1,0 +1,42 @@
+ticker
+ma50
+ma200
+ADX
+ADXR
+AROONOSC
+stochK
+stochD
+TRIX
+ULTOSC
+MACD
+MACDSIG
+MACDHIST
+TRANGE
+BBupperband
+BBmiddleband
+BBlowerband
+apo
+cci
+cfo
+cmo
+cti
+mom
+roc
+rsi
+rsx
+willr
+wma
+tema
+atr
+rvi
+VIX
+VXN
+Market Cap
+DPC
+Cumulative Return
+PriceUp
+Close Change
+Open Change
+High Change
+Low Change
+Target 
