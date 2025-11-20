@@ -1,9 +1,15 @@
-class Parameters:
-    cash = 10000
-    macd2 = 26
-    macdsig = 9
-    atrperiod = 14
-    atrdist = 2.0
-    order_pct = 1.0
-    # order_pct = 0.98
+import sys
+from pathlib import Path
 
+sys.path.append(str(Path(__file__).parent.parent))
+
+from config.trading_config import TradingConfig
+
+
+class Parameters:
+    cash = TradingConfig.CASH
+    macd2 = TradingConfig.MACD_SLOW
+    macdsig = TradingConfig.MACD_SIGNAL
+    atrperiod = TradingConfig.ATR_PERIOD
+    atrdist = TradingConfig.ATR_DISTANCE
+    order_pct = TradingConfig.ORDER_PERCENTAGE

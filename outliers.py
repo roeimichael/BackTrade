@@ -1,5 +1,6 @@
 import pandas as pd
-import main
+from config.path_config import PathConfig
+from utils.file_utils import read_lines_from_file
 
 
 def find_outliers_IQR(df):
@@ -10,25 +11,51 @@ def find_outliers_IQR(df):
     return outliers
 
 
-cols = main.get_columns()
-dates_list = main.get_dates()
-d = {}
+def analyze_outliers(dates_dir=None, columns_file=None):
+    if dates_dir is None:
+        dates_dir = PathConfig.DATA_DATES2_DIR
 
-for col in cols:
-    if "CDL" not in col and "Date" not in col and "ticker" not in col and "Unnamed" not in col:
-        d[col] = 0
+    if columns_file is None:
+        columns_file = PathConfig.COLUMNS_SMALL_FILE
 
-for date in dates_list:
-    df = pd.read_csv(
-        r'C:\Users\roeym\Desktop\data_backup\normaldist\dates_normdist_not_concatnated/' + date + '.csv')
+    dates_list = read_lines_from_file(PathConfig.DATES_FILE)
+    cols = read_lines_from_file(columns_file)
+
+    outlier_counts = {}
+
     for col in cols:
-        if "CDL" not in col and "Date" not in col and "ticker" not in col and "Unnamed" not in col:
-            d[col] += len(find_outliers_IQR(df[col]))
+        if all(x not in col for x in ["CDL", "Date", "ticker", "Unnamed"]):
+            outlier_counts[col] = 0
 
-file = open("./data/DictFile.txt", "w")
-for key, value in d.items():
-    file.write('%s:%s\n' % (key, value))
-file.close()
+    for date in dates_list:
+        date_file = dates_dir / f"{date}.csv"
 
-for key, value in d.items():
-    print(key, ':', value)
+        try:
+            df = pd.read_csv(date_file)
+
+            for col in cols:
+                if col in outlier_counts and col in df.columns:
+                    outliers = find_outliers_IQR(df[col])
+                    outlier_counts[col] += len(outliers)
+
+        except FileNotFoundError:
+            print(f"File not found: {date_file}")
+            continue
+        except Exception as e:
+            print(f"Error processing {date}: {e}")
+            continue
+
+    output_file = PathConfig.DATA_DIR / "DictFile.txt"
+    with open(output_file, "w") as file:
+        for key, value in outlier_counts.items():
+            file.write(f'{key}:{value}\n')
+
+    print("\nOutlier counts by column:")
+    for key, value in outlier_counts.items():
+        print(f"{key}: {value}")
+
+    return outlier_counts
+
+
+if __name__ == '__main__':
+    analyze_outliers()

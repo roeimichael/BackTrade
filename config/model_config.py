@@ -1,0 +1,18 @@
+class ModelConfig:
+    TEST_SIZE = 0.25
+    RANDOM_STATE = 42
+
+    SVM_KERNEL = 'rbf'
+    SVM_C = 50
+    SVM_GAMMA = 'auto'
+
+    LINEAR_SVC_MAX_ITER = 1000
+
+    MLP_ALPHA = 1
+    MLP_MAX_ITER = 1000
+
+    GAUSSIAN_PROCESS_KERNEL_SCALE = 1.0
+    GAUSSIAN_PROCESS_RBF_SCALE = 1.0
+
+    DATE_RANGE_START = 350
+    DATE_RANGE_END = 370

@@ -1,9 +1,6 @@
-import numpy as np
-import pandas as pd
 import warnings
-import matplotlib.pyplot as plt
+import pandas as pd
 from sklearn.svm import SVC, LinearSVC
-from sklearn import preprocessing
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
@@ -13,66 +10,79 @@ from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.gaussian_process.kernels import RBF
 from sklearn.neural_network import MLPClassifier
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-from sklearn.metrics import accuracy_score, precision_score, recall_score
-from helpers import load_data, preprocess_data, evaluate_model, plot_metrics
 
+from config.model_config import ModelConfig
+from helpers import load_data, preprocess_data, evaluate_model, plot_metrics
 
 warnings.filterwarnings('ignore')
 
-# Define your models here
-models = {
-    'Logistic Regression': LogisticRegression(),
-    'Support Vector Machines': LinearSVC(),
-    'Decision Trees': DecisionTreeClassifier(),
-    'Random Forest': RandomForestClassifier(),
-    'Naive Bayes': GaussianNB(),
-    'K-Nearest Neighbor': KNeighborsClassifier(),
-    'RBF SVM': SVC(gamma=2, C=1),
-    'Gaussian Process': GaussianProcessClassifier(1.0 * RBF(1.0)),
-    'Neural Net': MLPClassifier(alpha=1, max_iter=1000),
-    'AdaBoost': AdaBoostClassifier(),
-    'QDA': QuadraticDiscriminantAnalysis()
-}
 
-# Initialize data structures for storing results
-accuracies, precisions, recalls = {}, {}, {}
-avg_accuracies, avg_precisions, avg_recalls = [], [], []
+def get_models():
+    return {
+        'Logistic Regression': LogisticRegression(max_iter=1000),
+        'Support Vector Machines': LinearSVC(max_iter=ModelConfig.LINEAR_SVC_MAX_ITER),
+        'Decision Trees': DecisionTreeClassifier(),
+        'Random Forest': RandomForestClassifier(),
+        'Naive Bayes': GaussianNB(),
+        'K-Nearest Neighbor': KNeighborsClassifier(),
+        'RBF SVM': SVC(gamma=2, C=1),
+        'Gaussian Process': GaussianProcessClassifier(
+            ModelConfig.GAUSSIAN_PROCESS_KERNEL_SCALE * RBF(ModelConfig.GAUSSIAN_PROCESS_RBF_SCALE)
+        ),
+        'Neural Net': MLPClassifier(alpha=ModelConfig.MLP_ALPHA, max_iter=ModelConfig.MLP_MAX_ITER),
+        'AdaBoost': AdaBoostClassifier(),
+        'QDA': QuadraticDiscriminantAnalysis()
+    }
 
-# Load target data and dates
-target_df, dates = load_data()
 
-# Iterate over each model and perform training and evaluation
-for key in models.keys():
-    for i in range(350, 370):
-        x_train, y_train, x_validate, y_validate = preprocess_data(dates, i, target_df)
+def train_and_evaluate_models(exclude_models=None):
+    if exclude_models is None:
+        exclude_models = ["GaussianNB", "SVC"]
 
-        # Train the model
-        models[key].fit(x_train, y_train)
+    models = get_models()
+    target_df, dates = load_data()
 
-        # Validate the model
-        predictions = models[key].predict(x_validate)
+    avg_accuracies, avg_precisions, avg_recalls = [], [], []
 
-        # Evaluate and store metrics
-        accuracies[dates[i]], precisions[dates[i]], recalls[dates[i]] = evaluate_model(predictions, y_validate)
+    for key, model in models.items():
+        accuracies, precisions, recalls = {}, {}, {}
 
-    # Calculate average metrics for the current model
-    df_model = pd.DataFrame(index=dates[350:370], columns=['Accuracy', 'Precision', 'Recall'])
-    df_model['Accuracy'] = accuracies.values()
-    df_model['Precision'] = precisions.values()
-    df_model['Recall'] = recalls.values()
+        for i in range(ModelConfig.DATE_RANGE_START, ModelConfig.DATE_RANGE_END):
+            x_train, y_train, x_validate, y_validate = preprocess_data(dates, i, target_df)
 
-    avg_accuracies.append(df_model[df_model["Accuracy"] != 0]["Accuracy"].mean())
-    avg_precisions.append(df_model[df_model["Precision"] != 0]["Precision"].mean())
-    avg_recalls.append(df_model[df_model["Recall"] != 0]["Recall"].mean())
+            model.fit(x_train, y_train)
+            predictions = model.predict(x_validate)
 
-    print(models[key].__class__.__name__)
-    print(df_model)
-    print(f"Avg. Accuracy = {avg_accuracies[-1]}")
-    print(f"Avg. Precision = {avg_precisions[-1]}")
-    print(f"Avg. Recall = {avg_recalls[-1]}")
-    print("\n\n")
+            acc, prec, rec = evaluate_model(predictions, y_validate)
+            accuracies[dates[i]] = acc
+            precisions[dates[i]] = prec
+            recalls[dates[i]] = rec
 
-# Plot the metrics
-model_names = [model.__class__.__name__ for model in models.values()]
-exclude = ["GaussianNB", "SVC"]
-plot_metrics(model_names, avg_accuracies, avg_precisions, avg_recalls, exclude_models=exclude)
+        df_model = pd.DataFrame(
+            index=dates[ModelConfig.DATE_RANGE_START:ModelConfig.DATE_RANGE_END],
+            columns=['Accuracy', 'Precision', 'Recall']
+        )
+        df_model['Accuracy'] = list(accuracies.values())
+        df_model['Precision'] = list(precisions.values())
+        df_model['Recall'] = list(recalls.values())
+
+        avg_accuracy = df_model[df_model["Accuracy"] != 0]["Accuracy"].mean()
+        avg_precision = df_model[df_model["Precision"] != 0]["Precision"].mean()
+        avg_recall = df_model[df_model["Recall"] != 0]["Recall"].mean()
+
+        avg_accuracies.append(avg_accuracy)
+        avg_precisions.append(avg_precision)
+        avg_recalls.append(avg_recall)
+
+        print(f"\n{model.__class__.__name__}")
+        print(df_model)
+        print(f"Avg. Accuracy = {avg_accuracy:.4f}")
+        print(f"Avg. Precision = {avg_precision:.4f}")
+        print(f"Avg. Recall = {avg_recall:.4f}")
+
+    model_names = [model.__class__.__name__ for model in models.values()]
+    plot_metrics(model_names, avg_accuracies, avg_precisions, avg_recalls, exclude_models=exclude_models)
+
+
+if __name__ == '__main__':
+    train_and_evaluate_models()

@@ -1,50 +1,57 @@
 import time
+import yfinance as yf
+
+from config.data_config import DataConfig
+from config.path_config import PathConfig
+from config.processing_config import ProcessingConfig
+from utils.file_utils import read_lines_from_file
+
 import scanner
 import datesEdit
 import concatnation
 import normalization
-import yfinance as yf
-
-# Constants
-STOCKSCSV = "Stocks in the SP 500 Index.csv"
-SP500TICKER = "^GSPC"
-START = "2019-05-01"
-END = "2022-05-01"
-INTERVAL = '1d'
 
 
-# Create S&P 500 DataFrame
 def create_sp500():
-    print("Creating S&P 500 tickers file...")
-    stock = yf.Ticker(SP500TICKER)
-    df_sp = stock.history(start=START, end=END, interval=INTERVAL)
+    print("Creating S&P 500 data file...")
+    stock = yf.Ticker(DataConfig.SP500_TICKER)
+    df_sp = stock.history(
+        start=DataConfig.START_DATE,
+        end=DataConfig.END_DATE,
+        interval=DataConfig.INTERVAL
+    )
     df_sp.drop(columns=['Dividends', 'Stock Splits'], inplace=True)
-    df_sp.to_csv("S&P500.csv")
+    df_sp.to_csv(PathConfig.SP500_FILE)
     return df_sp
 
 
-# Read columns from a file
-def read_columns(file_path):
-    with open(file_path, 'r') as file:
-        return [line.strip() for line in file]
+def load_input_data():
+    tickers = read_lines_from_file(PathConfig.TICKERS_FILE)
+    dates = read_lines_from_file(PathConfig.DATES_FILE)
+    columns = read_lines_from_file(PathConfig.COLUMNS_SMALL_FILE)
+    return tickers, dates, columns
 
 
-# Main function
-if __name__ == '__main__':
-    t1 = time.perf_counter()
-
-    # Get necessary data
-    create_sp500()
-    tickers = read_columns('./data/tickers.txt')
-    dates = read_columns('./data/dates.txt')
-    columns = read_columns('./data/columns_small.txt')
-
-    # Run the processing steps
+def run_data_pipeline(tickers, dates, columns):
     scanner.main(tickers)
     normalization.normalization_main(tickers)
-    dates = dates[:658]  # Remove the last 100 days because of normalization window
-    datesEdit.dates_edit_main(tickers, dates, columns)
-    concatnation.concatanation_main(dates)
+
+    adjusted_dates = dates[:658]
+    datesEdit.dates_edit_main(tickers, adjusted_dates, columns)
+    concatnation.concatanation_main(adjusted_dates)
+
+
+def main():
+    t1 = time.perf_counter()
+
+    PathConfig.ensure_directories()
+    create_sp500()
+    tickers, dates, columns = load_input_data()
+    run_data_pipeline(tickers, dates, columns)
 
     t2 = time.perf_counter()
-    print(f'Finished main in {t2 - t1} seconds')
+    print(f'Finished main in {t2 - t1:.2f} seconds')
+
+
+if __name__ == '__main__':
+    main()

@@ -1,5 +1,8 @@
 import os
 import pandas as pd
+from config.path_config import PathConfig
+from config.processing_config import ProcessingConfig
+from config.model_config import ModelConfig
 
 
 def add_close_change_column(data, threshold):
@@ -10,20 +13,31 @@ def add_close_change_column(data, threshold):
 
 def merge_csv_files(path, column_name):
     merged_data = pd.DataFrame()
-    for i, filename in enumerate(os.listdir(path)):
-        if filename.endswith(".csv"):
-            data = pd.read_csv(os.path.join(path, filename))
+    csv_files = [f for f in os.listdir(path) if f.endswith(".csv")]
+
+    for filename in csv_files:
+        file_path = os.path.join(path, filename)
+        data = pd.read_csv(file_path)
+
+        if column_name in data.columns:
             column = data[[column_name]] * 100
             merged_data = pd.concat([merged_data, column], axis=1) if not merged_data.empty else column
-    merged_data.columns = [filename.split(".")[0] for filename in os.listdir(path) if filename.endswith(".csv")]
-    merged_data.index = data['Date']
-    merged_data.to_csv(f"./data/S&Pdata/{column_name}.csv", index=True)
+
+    if not merged_data.empty:
+        merged_data.columns = [f.split(".")[0] for f in csv_files]
+        if 'Date' in data.columns:
+            merged_data.index = data['Date']
+
+        output_file = PathConfig.DATA_SNP_DIR / f"{column_name}.csv"
+        merged_data.to_csv(output_file, index=True)
 
 
 def create_binary_file(file_path, threshold, index_col):
     data = pd.read_csv(file_path, index_col=index_col)
     binary_data = (data >= threshold).astype(int)
-    output_file = f"./data/S&Pdata/{os.path.basename(file_path).split('.')[0]}_binary{threshold}.csv"
+
+    base_name = os.path.basename(file_path).split('.')[0]
+    output_file = PathConfig.DATA_SNP_DIR / f"{base_name}_binary{threshold}.csv"
     binary_data.to_csv(output_file, index=True)
 
 
@@ -35,23 +49,23 @@ def add_num_stocks_column(sp500_file, binary_file, threshold):
     sp500_data.to_csv(sp500_file, index=False)
 
 
-def main():
-    sp500_csv = "./data/S&Pdata/S&P500.csv"
-    close_change_csv = "./data/S&Pdata/Close Change_binary2.5.csv"
+def analyze_sp500_precision(threshold=2.5):
+    sp500_csv = PathConfig.DATA_SNP_DIR / "S&P500.csv"
+    close_change_csv = PathConfig.DATA_SNP_DIR / f"Close Change_binary{threshold}.csv"
 
-    # Uncomment the following lines to use the functions
-    # df = pd.read_csv(sp500_csv)
-    # df = add_close_change_column(df, 2.5)
-    # df.to_csv(sp500_csv, index=True)
+    add_num_stocks_column(sp500_csv, close_change_csv, threshold)
 
-    # merge_csv_files("./data/stocks/", "Close Change")
-    # create_binary_file("./data/S&Pdata/Close Change.csv", 2, "Date")
-
-    add_num_stocks_column(sp500_csv, close_change_csv, 2.5)
     sp_df = pd.read_csv(sp500_csv)
-    avg_precision = sum(sp_df[350:370]['precision']) / 20
-    print(avg_precision)
+
+    if 'precision' in sp_df.columns:
+        date_range = sp_df[ModelConfig.DATE_RANGE_START:ModelConfig.DATE_RANGE_END]
+        avg_precision = date_range['precision'].mean()
+        print(f"Average precision: {avg_precision:.4f}")
+        return avg_precision
+    else:
+        print("Precision column not found in S&P500 data")
+        return None
 
 
 if __name__ == "__main__":
-    main()
+    analyze_sp500_precision()
